@@ -2,7 +2,7 @@ import os
 import logging
 import google.generativeai as genai
 from fastapi import HTTPException
-from .utils import clean_markdown_tables
+from utils import clean_markdown_tables
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
