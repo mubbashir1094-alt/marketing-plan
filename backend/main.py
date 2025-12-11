@@ -5,6 +5,7 @@ import logging
 import re
 from pathlib import Path
 from dotenv import load_dotenv
+import asyncio
 
 # Load env vars from the backend directory before importing modules
 env_path = Path(__file__).parent / '.env'
@@ -63,6 +64,11 @@ async def health_check():
 @app.post("/generate")
 async def generate_marketing_plan(request: MarketingPlanRequest):
     """Generate a comprehensive marketing plan based on business information"""
+    
+    # Validate API key is configured
+    if not GOOGLE_API_KEY:
+        logger.error("GOOGLE_API_KEY not configured in environment variables")
+        raise HTTPException(status_code=500, detail="Server not configured: GOOGLE_API_KEY is missing")
     
     prompt = f"""You are an expert digital marketing strategist. 
 
@@ -156,8 +162,17 @@ List 3–5 risks + solutions.
 
     try:
         logger.info("Generating marketing plan using Google Generative AI (Gemini)")
+        logger.info(f"Request: {request.businessName} - {request.industry}")
         
-        plan = generate_with_google(prompt)
+        # Add timeout to prevent hanging
+        try:
+            plan = await asyncio.wait_for(
+                asyncio.to_thread(generate_with_google, prompt),
+                timeout=120  # 2 minutes timeout
+            )
+        except asyncio.TimeoutError:
+            logger.error("Marketing plan generation timed out after 120 seconds")
+            raise HTTPException(status_code=504, detail="Generation timeout - try again")
         
         if not plan:
             logger.error("Empty plan generated")
@@ -191,6 +206,11 @@ async def generate_blog(request: BlogRequest):
     Request body must include: topic, targetKeyword, targetAudience, blogLength, tone.
     Optional: businessName, industry, additionalNotes.
     """
+    
+    # Validate API key is configured
+    if not GOOGLE_API_KEY:
+        logger.error("GOOGLE_API_KEY not configured in environment variables")
+        raise HTTPException(status_code=500, detail="Server not configured: GOOGLE_API_KEY is missing")
 
     # Basic validation for allowed blogLength and tone values
     allowed_lengths = {"500-800", "1000-1500", "1500-2000", "2000+"}
@@ -248,8 +268,17 @@ Additional Notes: {request.additionalNotes or "None"}
 
     try:
         logger.info("Generating SEO blog using Google Generative AI (Gemini)")
+        logger.info(f"Blog topic: {request.topic} - Keyword: {request.targetKeyword}")
         
-        blog = generate_with_google(prompt)
+        # Add timeout to prevent hanging
+        try:
+            blog = await asyncio.wait_for(
+                asyncio.to_thread(generate_with_google, prompt),
+                timeout=120  # 2 minutes timeout
+            )
+        except asyncio.TimeoutError:
+            logger.error("Blog generation timed out after 120 seconds")
+            raise HTTPException(status_code=504, detail="Generation timeout - try again")
 
         if not blog:
             logger.error("Empty blog generated")

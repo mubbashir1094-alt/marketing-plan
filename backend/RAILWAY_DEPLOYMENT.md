@@ -13,7 +13,7 @@ This guide walks you through deploying your FastAPI backend to Railway.
 ## Prerequisites
 
 - A [Railway account](https://railway.app) (sign up with GitHub for easiest setup)
-- Your code pushed to GitHub: https://github.com/geniusaidigital-pixel/marketingplan-backend
+- Your code pushed to GitHub: https://github.com/mubbashir1094-alt/marketing-plan
 - Your Google API key ready
 
 ## Step 1: Create a New Project on Railway
@@ -45,7 +45,7 @@ gunicorn -w 4 -k uvicorn.workers.UvicornWorker main:app --bind 0.0.0.0:$PORT
 
 | Variable Name | Value |
 |---------------|-------|
-| `GOOGLE_API_KEY` | `AIzaSyCbL25eXVOx2F67Uj46meMImYNgrYpRM1g` |
+| `GOOGLE_API_KEY` | `your-google-api-key-here` |
 | `PORT` | `8000` |
 
 ## Step 4: Deploy
@@ -59,7 +59,7 @@ gunicorn -w 4 -k uvicorn.workers.UvicornWorker main:app --bind 0.0.0.0:$PORT
 1. In your Railway service, go to the **"Settings"** tab
 2. Scroll down to **"Networking"** or **"Domains"**
 3. Click **"Generate Domain"**
-4. Railway will give you a URL like: `https://marketingplan-backend-production.up.railway.app`
+4. Railway will give you a URL like: `https://marketing-plan-production.up.railway.app`
 
 ## Step 6: Test Your Deployment
 
